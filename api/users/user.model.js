@@ -20,7 +20,7 @@ function getUsers (callBack) {
         if(err) {
             callBack(err);
         };
-        console.log(results.password);
+        // console.log(results.password);
         return callBack(null, results);
     })
 }
@@ -62,6 +62,17 @@ function getUserByEmail(email, pwd, callBack){
     })
 }
 
+// insert freshToken & user_id in database table AUTH
+function insertFToken(userId, FT, callBack) { 
+    db.query(`INSERT INTO AUTH (user_id, refreshToken) values (?, ?)`, [userId, FT], (err, results) => {
+        if(err){ 
+            callBack(err);
+        }
+        console.log(results);
+        return callBack(null, results);
+    })
+}
+
 
 
 
@@ -72,5 +83,6 @@ module.exports = {
     getUserById,
     updateUser,
     deleteUser,
-    getUserByEmail
+    getUserByEmail,
+    insertFToken
 };

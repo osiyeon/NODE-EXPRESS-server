@@ -1,11 +1,7 @@
-const { create, getUsers, getUserById, updateUser, deleteUser, getUserByEmail } = require('./user.model');
-// const { genSaltSync, hashSync, compareSync} = require("bcrypt");
+const { create, getUsers, getUserById, updateUser, deleteUser, getUserByEmail, insertFToken } = require('./user.model');
 const { sign } = require("jsonwebtoken");
 
 function createUser (req, res) {
-    // const body = req.body;
-    // const salt = genSaltSync(10);
-    // body.password = hashSync(body.password, salt);
     create(req.body, (err, results) => {
         if (err){
             console.log(err);
@@ -35,7 +31,8 @@ function getUsersById(req, res){
         }
         return res.json({
             success: 1, 
-            data: results
+            data: results,
+            // token: req.body.jsontoken
         })
     })
 }
@@ -55,8 +52,6 @@ function getUser(req, res){
 
 function updateUsers(req, res){
     const body = req.body;
-    // const salt = genSaltSync(10);
-    // body.password = hashSync(body.password, salt);
     updateUser(body, (err, results) => {
         if(err) {
             console.log(err);
@@ -74,6 +69,7 @@ function updateUsers(req, res){
         })
     })
 }
+
 function deleteUsers(req, res) {
     const data = req.body;
     deleteUser(data, (err, results) => {
@@ -109,40 +105,21 @@ function login(req, res){
             })
         }
         results.password = undefined;
-        const jsontoken = sign({ result: results }, "shhhhh", {
-            expiresIn: "1h"
-        });
-        return res.json({
-            success:1,
-            message: "login successfully",
-            token: jsontoken
+        console.log(results)
+        const jsontoken = sign({ result: results }, "access", { expiresIn: '3m' });
+        const refreshToken = sign({ result: results }, "refresh" , { expiresIn: '7d'});
+        insertFToken(results.id, refreshToken, (err, result) => {
+            if(err){
+                console.log(err);
+                return;
+            }
+            return res.json({
+                success:1,
+                message: "login successfully",
+                token: jsontoken,
+                refreshToken: refreshToken
+            });    
         })
-
-
-        // console.log(body.password)
-        // console.log(results.password)
-        // const result = compareSync(body.password, results.password, (err, success) => {
-        //     if(err) throw err;
-        //     console.log(success);
-        //     return success;
-        // });
-        // console.log(result);
-        // if(result){
-        //     results.password = undefined;
-        //     const jsontoken = sign({ result: result }, "shhhhh", {
-        //         expiresIn: "1h"
-        //     });
-        //     return res.json({
-        //         success:1,
-        //         message: "login successfully",
-        //         token: jsontoken
-        //     })
-        // } else {
-        //     return res.json({
-        //         success: 0,
-        //         message: "Invalid email or password"
-        //     });
-        // }
     })
 }
 
@@ -154,5 +131,6 @@ module.exports = {
     getUser,
     updateUsers,
     deleteUsers,
-    login
+    login,
+    // tokenList
 }

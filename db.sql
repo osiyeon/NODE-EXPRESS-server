@@ -14,6 +14,17 @@ INSERT INTO `USER` VALUES (3, 'sujin', '30');
 INSERT INTO `USER` VALUES (4, 'duli', '12');
 
 
+-- refresh token 보관을 위한 Auth table 생성. 
+
+CREATE TABLE `AUTH` (
+    `id` int(11) NOT NULL AUTO_INCREMENT,
+    `user_id` int(11) NOT NULL,
+    `refreshToken` varchar(300) NOT NULL,
+    PRIMARY KEY (`id`),
+    FOREIGN KEY(`user_id`) REFERENCES USER(id)
+);
+
+
 CREATE TABLE `posting` (
     `id` int(11) NOT NULL AUTO_INCREMENT,
     `title` varchar(30) NOT NULL,
