@@ -1,3 +1,5 @@
+-- 테이블 생성을 위한 코드 저장 공간 
+
 CREATE TABLE `USER` (
     `id` int(11) NOT NULL AUTO_INCREMENT,
     `name` varchar(20) NOT NULL,
@@ -13,7 +15,6 @@ INSERT INTO `USER` VALUES (2, 'gildong', '25');
 INSERT INTO `USER` VALUES (3, 'sujin', '30');
 INSERT INTO `USER` VALUES (4, 'duli', '12');
 
-
 -- refresh token 보관을 위한 Auth table 생성. 
 
 CREATE TABLE `AUTH` (
@@ -21,7 +22,8 @@ CREATE TABLE `AUTH` (
     `user_id` int(11) NOT NULL,
     `refreshToken` varchar(300) NOT NULL,
     PRIMARY KEY (`id`),
-    FOREIGN KEY(`user_id`) REFERENCES USER(id)
+    FOREIGN KEY(`user_id`) REFERENCES USER(id),
+    UNIQUE(user_id)
 );
 
 
@@ -33,6 +35,8 @@ CREATE TABLE `posting` (
     `user_id` int(11) DEFAULT NULL,
     PRIMARY KEY (`id`)
 );
+
+-- 여기서는 일단 사용하지 않음. 
 
 INSERT INTO `posting` VALUES (1,'MySQL','MySQL is...','2018-01-01 12:10:11',1);
 INSERT INTO `posting` VALUES (2,'Oracle','Oracle is ...','2018-01-03 13:01:10',1);

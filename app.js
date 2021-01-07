@@ -6,6 +6,7 @@ const userRouter = require('./api/users/user.router')
 
 app.use(express.json());
 
+// user routes
 app.use("/api/users", userRouter);
 
 

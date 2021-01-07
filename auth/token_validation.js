@@ -1,5 +1,4 @@
 const { verify, sign } = require("jsonwebtoken");
-// const { tokenList } = require('../api/users/user.controller');
 const db = require('../config/database');
 
 
@@ -20,8 +19,7 @@ async function getUserByRT(refreshToken) {
 )}
 
 
-function renewAccessToken ( refreshToken,req, res) {
-    // console.log(refreshToken)
+function renewAccessToken ( refreshToken, req, res) {
     if(!refreshToken){
         return res.status(403).json({ 
             success: 0,
@@ -30,14 +28,9 @@ function renewAccessToken ( refreshToken,req, res) {
     } else {
         verify(refreshToken, "refresh", async(err, decoded) => {
             let result = await getUserByRT(refreshToken);
-            // console.log(decoded);
             if(!err) {
                 const accessToken = sign({ result: result }, "access", { expiresIn: "1h" });
-                console.log(accessToken)
-                // return res.status(201).json({ 
-                //     success: 1,
-                //     token:  accessToken 
-                // });
+                console.log("accessToken:" + accessToken)
             } else {
                 return res.status(403).json({
                     success: 0,
@@ -45,35 +38,12 @@ function renewAccessToken ( refreshToken,req, res) {
                 })
             }
         })        
-
-        // let token = req.get("authorization");
-        // if(!token) {
-        //     verify(refreshToken, "refresh", (err, decoded) => {
-        //         console.log("?");
-        //         console.log(decoded);
-        //         if(!err) {
-        //             const accessToken = sign({ result: decoded.result }, "access", { expiresIn: "1h" });
-        //             return res.status(201).json({ 
-        //                 success: 1,
-        //                 token:  accessToken 
-        //             });
-        //         } else {
-        //             return res.status(403).json({
-        //                 success: 0,
-        //                 message: "Access denied! unauthorized user"
-        //             })
-        //         }
-        //     })        
-
-        // }
     }
-
 }
 
 function checkToken(req, res, next){
     let refreshToken = req.body.refreshToken;
     let token = req.get("authorization");
-    // console.log(token);
     if(token){
         token = token.slice(7);
         verify(token, "access", (err, decoded) => {
@@ -85,9 +55,8 @@ function checkToken(req, res, next){
                 next();
             }
         })
-
     } else {
-        res.json({
+        res.status(401).json({
             success: 0,
             message: "Access denied! unauthorized user"
         })
@@ -97,5 +66,4 @@ function checkToken(req, res, next){
 
 module.exports = {
     checkToken,
-    // renewAccessToken
 }

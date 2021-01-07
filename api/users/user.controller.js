@@ -1,6 +1,7 @@
-const { create, getUsers, getUserById, updateUser, deleteUser, getUserByEmail, insertFToken } = require('./user.model');
+const { create, getUsers, getUserById, updateUser, deleteUser, getUserByEmail, insertFToken, removeRefreshtoken } = require('./user.model');
 const { sign } = require("jsonwebtoken");
 
+// create user
 function createUser (req, res) {
     create(req.body, (err, results) => {
         if (err){
@@ -10,12 +11,14 @@ function createUser (req, res) {
                 message: "Database connection error"
             });
         }
-        return res.status(200).json({
+        return res.status(201).json({
             success:1,
             data:results
         });
     });
 }
+
+// get User by userID
 function getUsersById(req, res){
     const id = req.params.id;
     getUserById(id, (err, results) => {
@@ -24,32 +27,33 @@ function getUsersById(req, res){
             return;
         }
         if (!results) {
-            return res.json({
+            return res.status(404).json({
                 success: 0,
                 message: "Record not Found"
             })
         }
-        return res.json({
+        return res.status(200).json({
             success: 1, 
             data: results,
-            // token: req.body.jsontoken
         })
     })
 }
 
+// get All User
 function getUser(req, res){
     getUsers((err, results) => {
         if (err) {
             console.log(err);
             return;
         }
-        return res.json({
+        return res.status(200).json({
             success: 1, 
             data: results
         })
     })
 }
 
+// Update User
 function updateUsers(req, res){
     const body = req.body;
     updateUser(body, (err, results) => {
@@ -63,13 +67,14 @@ function updateUsers(req, res){
                 message: "Failed to update user"
             })
         }
-        return res.json({
+        return res.status(201).json({
             success: 1,
             message: "updated successfully"
         })
     })
 }
 
+// Delete User
 function deleteUsers(req, res) {
     const data = req.body;
     deleteUser(data, (err, results) => {
@@ -90,6 +95,7 @@ function deleteUsers(req, res) {
     })
 }
 
+// email Login
 function login(req, res){
     const body = req.body;
     getUserByEmail(body.email, body.password, (err, results) => {
@@ -113,12 +119,26 @@ function login(req, res){
                 console.log(err);
                 return;
             }
-            return res.json({
+            return res.status(200).json({
                 success:1,
                 message: "login successfully",
                 token: jsontoken,
                 refreshToken: refreshToken
             });    
+        })
+    })
+}
+
+function logout(req, res){
+    const refreshToken = req.body.refreshToken;
+    removeRefreshtoken(refreshToken, (err, results) => {
+        if(err){
+            console.log(err);
+            return;
+        }
+        return res.json({
+            success: 1,
+            message: "deleted successfully"
         })
     })
 }
@@ -132,5 +152,5 @@ module.exports = {
     updateUsers,
     deleteUsers,
     login,
-    // tokenList
+    logout
 }
